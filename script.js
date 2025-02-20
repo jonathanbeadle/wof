@@ -4,7 +4,6 @@ const spinButton = document.getElementById("spinButton");
 const prizeModal = document.getElementById("prizeModal");
 const prizeText = document.getElementById("prizeText");
 
-// Ensure the canvas size matches its container’s computed size.
 function resizeCanvas() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
@@ -13,16 +12,16 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 // ------------------------------------------------------------------
-// 1. True Weighted Distribution (for determining the win)
+// 1. True Weighted Distribution
 // ------------------------------------------------------------------
 const weightedDistribution = [
   { prize: "£100 Bar Tab", weight: 1, color: "#e5cb5d" },
   { prize: "£50 Bar Tab", weight: 2, color: "#f64649" },
   { prize: "£25 Bar Tab", weight: 4, color: "#d12de6" },
-  { prize: "Free Round", weight: 25, color: "#8549f6" },
+  { prize: "Free Round", weight: 12, color: "#8549f6" },
   { prize: "Half Price Round", weight: 25, color: "#4b68ff" },
   { prize: "25% Off", weight: 50, color: "#2c41af" },
-  { prize: "Free Shot", weight: 150, color: "#2a2f5b" },
+  { prize: "10% Off", weight: 150, color: "#2a2f5b" },
   { prize: "Lose", weight: 243, color: "#333333" }
 ];
 const totalWeight = weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
@@ -58,7 +57,6 @@ visualSegments[31] = { prize: "Half Price Round", color: "#4b68ff" };
 // Remaining indices (16 total):
 const remainingIndices = [2,3,5,6,10,11,13,14,18,19,21,22,26,27,29,30];
 
-// Force the slices immediately adjacent to each Free Round (indices 4,12,20,28) to be Lose.
 const freeRoundNeighbors = new Set([3,5,11,13,19,21,27,29]);
 freeRoundNeighbors.forEach(idx => {
   visualSegments[idx] = { prize: "Lose", color: "#333333" };
@@ -69,14 +67,10 @@ const leftover = remainingIndices.filter(idx => !freeRoundNeighbors.has(idx));
 leftover.sort((a, b) => a - b);
 // Assign the leftover positions as Free Shot.
 for (let idx of leftover) {
-  visualSegments[idx] = { prize: "Free Shot", color: "#2a2f5b" };
+  visualSegments[idx] = { prize: "10% Off", color: "#2a2f5b" };
 }
-// Final visual counts: £100:1, £50:1, £25:2, Free Round:4, Half Price Round:4, 25% Off:4, Free Shot:8, Lose:8.
 
-// ------------------------------------------------------------------
-// 3. Draw the Visual Wheel with a Beveled Border
-// ------------------------------------------------------------------
-const initialOffsetDeg = -90; // So that 0° corresponds to the top.
+const initialOffsetDeg = -90;
 function drawWheel() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
@@ -95,7 +89,6 @@ function drawWheel() {
     ctx.fillStyle = visualSegments[i].color;
     ctx.fill();
     
-    // Draw prize labels with 16px font, placed at (radius - 24)
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -106,7 +99,6 @@ function drawWheel() {
     ctx.restore();
   }
   
-  // Draw a 20px thick border around the edge of the wheel with a radial gradient.
   const borderWidth = 16;
   const grad = ctx.createRadialGradient(centerX, centerY, radius - borderWidth, centerX, centerY, radius);
   grad.addColorStop(0, "#000");
@@ -173,7 +165,12 @@ spinButton.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", function(e) {
-  if ((e.code === "Space" || e.code === "Return") && !spinButton.disabled) {
+  console.log("Key pressed:", e.key, "Code:", e.code);
+});
+
+document.addEventListener("keydown", function(e) {
+  if ((e.code === "Space" || e.code === "NumpadEnter") && !spinButton.disabled) {
     spinButton.click();
   }
 });
+
