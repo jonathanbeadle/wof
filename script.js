@@ -173,7 +173,7 @@ spinButton.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", function(e) {
-  if ((e.code === "Space" || e.code === "Enter") && !spinButton.disabled) {
+  if ((e.code === "Space" || e.code === "Return") && !spinButton.disabled) {
     spinButton.click();
   }
 });
