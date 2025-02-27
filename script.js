@@ -22,7 +22,7 @@ const weightedDistribution = [
   { prize: "Half Price Round", weight: 25, color: "#4b68ff" },
   { prize: "25% Off", weight: 50, color: "#2c41af" },
   { prize: "10% Off", weight: 150, color: "#2a2f5b" },
-  { prize: "Lose", weight: 243, color: "#333333" }
+  { prize: "Full Price", weight: 243, color: "#333333" }
 ];
 const totalWeight = weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
 
@@ -59,7 +59,7 @@ const remainingIndices = [2,3,5,6,10,11,13,14,18,19,21,22,26,27,29,30];
 
 const freeRoundNeighbors = new Set([3,5,11,13,19,21,27,29]);
 freeRoundNeighbors.forEach(idx => {
-  visualSegments[idx] = { prize: "Lose", color: "#333333" };
+  visualSegments[idx] = { prize: "Full Price", color: "#333333" };
 });
 
 // Leftover indices among remaining:
