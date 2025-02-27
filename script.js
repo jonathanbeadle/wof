@@ -153,7 +153,7 @@ spinButton.addEventListener("click", () => {
   currentRotationDeg = finalRotationDeg;
   
   setTimeout(() => {
-    prizeText.textContent = winningPrizeObj.prize === "Lose" ? "You Lost" : winningPrizeObj.prize;
+    prizeText.textContent = winningPrizeObj.prize === "Full Price" ? "Full Price" : winningPrizeObj.prize;
     prizeModal.style.backgroundColor = winningPrizeObj.color;
     prizeText.style.color = winningPrizeObj.prize === "£100 Bar Tab" ? "#000" : "#fff";
     prizeModal.style.display = "block";
