@@ -174,3 +174,9 @@ document.addEventListener("keydown", function(e) {
   }
 });
 
+document.addEventListener("click", function() {
+  if (!spinButton.disabled) {
+    spinButton.click();
+  }
+});
+
