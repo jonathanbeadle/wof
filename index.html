@@ -7,22 +7,61 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Mute Button with Icons -->
+  <button id="muteButton" class="mute-button">
+      <span class="icon-unmuted">🔊</span>
+      <span class="icon-muted">🔇</span>
+  </button>
   <div class="container">
+    <div class="spacer"></div>
     <div class="wheel-container">
       <canvas id="wheelCanvas"></canvas>
-      <!-- Pointer at the top -->
       <div class="pointer"></div>
-      <!-- Center spin button now displays the logo -->
       <div id="spinButton" class="centerButton">
         <img src="logo.png" alt="Logo" class="centerLogo" />
       </div>
     </div>
+    <div class="right-section">
+      <div class="recent-wins">
+        <h2>Recent Spins</h2>
+        <div id="winsList"></div>
+        <div class="responsibility-logos">
+          <img src="drink-responsibly.png" alt="Drink Responsibly" class="responsibility-logo">
+          <img src="Drinkaware_logo_URL_RGB.webp" alt="Drinkaware" class="responsibility-logo">
+        </div>
+      </div>
+    </div>
     <div id="prizeModal" class="modal">
       <div class="modal-content">
-        <span id="prizeText"></span>
+        <div class="prize-celebration"></div>
+        <div class="prize-header">Congratulations!</div>
+        <div id="prizeText"></div>
+        <div class="prize-particles"></div>
       </div>
     </div>
   </div>
+
+  <!-- Audio elements for sound effects -->
+  <audio id="spinSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3" type="audio/mpeg">
+  </audio>
+  <!-- Create a pool of tick sounds -->
+  <audio id="tickSound1" class="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="tickSound2" class="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="tickSound3" class="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+   <audio id="tickSound4" class="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/221/221-preview.mp3" type="audio/mpeg">
+  </audio>
+
   <script src="script.js"></script>
 </body>
 </html>
