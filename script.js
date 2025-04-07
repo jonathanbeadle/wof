@@ -618,8 +618,29 @@ function toggleMute() {
 }
 
 // --- Event Listeners ---
-spinButton.addEventListener("click", spinWheel); // Revert to direct call
-muteButton.addEventListener("click", toggleMute); // Add listener for mute button click
+spinButton.addEventListener("click", function(e) {
+  e.stopPropagation(); // Prevent the document click from also triggering
+  spinWheel();
+}); 
+muteButton.addEventListener("click", function(e) {
+  e.stopPropagation(); // Prevent the document click from also triggering
+  toggleMute();
+}); 
+
+// Add click event for the entire document to spin the wheel
+document.addEventListener("click", function(e) {
+  // Don't spin if we're already spinning or if clicking on modal or mute button
+  if (isSpinning || spinButton.disabled) return;
+  
+  // Don't spin if clicking on the prize modal
+  if (prizeModal.style.display === "block" && prizeModal.contains(e.target)) return;
+  
+  // Don't spin if clicking on recent wins section
+  const recentWinsSection = document.querySelector('.recent-wins');
+  if (recentWinsSection && recentWinsSection.contains(e.target)) return;
+  
+  spinWheel();
+});
 
 // Prevent Enter key from activating mute button when focused
 muteButton.addEventListener("keydown", function(e) {
