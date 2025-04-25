@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Wheel Spinner Settings</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div id="password-prompt" class="container">
+        <h1>Enter Admin Password</h1>
+        <input type="password" id="password-input" placeholder="Password">
+        <button id="password-submit">Submit</button>
+        <p id="password-error" class="error-message"></p>
+    </div>
+
+    <div id="admin-controls" class="container" style="display: none;">
+        <h1>Select Wheel Mode</h1>
+        <select id="mode-select">
+            <option value="standard">Standard Mode</option>
+            <option value="slow">Slow Mode</option>
+            <option value="joke">Joke Mode</option>
+            <option value="jb">JB Mode</option>
+        </select>
+        <button id="save-mode">Save Mode</button>
+        <p id="save-status" class="status-message"></p>
+        <!-- Removed Back to Wheel link -->
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

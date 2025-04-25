@@ -6,6 +6,14 @@ const prizeText = document.getElementById("prizeText");
 const winsList = document.getElementById("winsList");
 const MAX_RECENT_WINS = 5;  // Reduced from 10 to 5 to fit without scrolling
 
+// --- Mode Configuration ---
+const MODE_STORAGE_KEY = 'wheelMode';
+let currentMode = 'standard'; // Default mode
+let activeWeightedDistribution = [];
+let activeVisualSegments = [];
+let activeTotalWeight = 0;
+// --------------------------
+
 const PARTICLE_COUNT = 200; // Increased further from 100
 const MAJOR_PRIZES = ["£100 Bar Tab", "£50 Bar Tab", "£25 Bar Tab", "Free Round"];
 
@@ -217,9 +225,9 @@ function updateWinsList() {
 updateWinsList();
 
 // ------------------------------------------------------------------
-// 1. True Weighted Distribution
+// 1. Base Configurations (Standard Mode)
 // ------------------------------------------------------------------
-const weightedDistribution = [
+const baseWeightedDistribution = [
   { prize: "£100 Bar Tab", weight: 1, color: "#e5cb5d" },
   { prize: "£50 Bar Tab", weight: 2, color: "#f64649" },
   { prize: "£25 Bar Tab", weight: 4, color: "#d12de6" },
@@ -229,7 +237,116 @@ const weightedDistribution = [
   { prize: "10% Off", weight: 150, color: "#2a2f5b" },
   { prize: "Full Price", weight: 243, color: "#333333" }
 ];
-const totalWeight = weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
+const baseTotalWeight = baseWeightedDistribution.reduce((sum, p) => sum + p.weight, 0);
+
+// Deep copy function for objects and arrays
+function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+// Function to get configuration based on mode
+function getModeConfiguration(mode) {
+    let config = {
+        weightedDistribution: deepCopy(baseWeightedDistribution),
+        visualSegments: deepCopy(visualSegments), // Use the globally defined visualSegments as base
+        totalWeight: baseTotalWeight
+    };
+
+    const barTabPrizes = ["£100 Bar Tab", "£50 Bar Tab", "£25 Bar Tab"];
+
+    switch (mode) {
+        case 'slow':
+            console.log("Applying SLOW mode configuration");
+            // Set weight of all bar tabs to 0
+            config.weightedDistribution = config.weightedDistribution.map(item => {
+                if (barTabPrizes.includes(item.prize)) {
+                    return { ...item, weight: 0 };
+                }
+                return item;
+            });
+            // Recalculate total weight
+            config.totalWeight = config.weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
+            // Visuals remain the same
+            break;
+
+        case 'joke':
+            console.log("Applying JOKE mode configuration");
+            const jokePrize = "£100 Bar Tab";
+            const realPrize = "Full Price";
+            const realPrizeColor = "#333333"; // Full Price color
+
+            // Adjust visual segments: all but one show joke prize
+            let realPrizePlaced = false;
+            config.visualSegments = config.visualSegments.map((segment, index) => {
+                // Place the *real* prize visually in one specific slot (e.g., index 2)
+                if (index === 2 && !realPrizePlaced) {
+                     realPrizePlaced = true;
+                     return { prize: realPrize, color: realPrizeColor };
+                }
+                // All other segments show the joke prize visually
+                return { prize: jokePrize, color: "#e5cb5d" }; // £100 Bar Tab color
+            });
+             // Ensure real prize was placed if index 2 wasn't available (fallback)
+            if (!realPrizePlaced) {
+                 config.visualSegments[0] = { prize: realPrize, color: realPrizeColor };
+            }
+
+
+            // Adjust weighted distribution: 100% chance of landing on the *real* prize
+            config.weightedDistribution = config.weightedDistribution.map(item => {
+                if (item.prize === realPrize) {
+                    return { ...item, weight: 1 }; // Only the real prize has weight
+                }
+                return { ...item, weight: 0 }; // All others have 0 weight
+            });
+            config.totalWeight = 1; // Only the real prize can be chosen
+            break;
+
+        case 'jb':
+            console.log("Applying JB mode configuration (50% £100 / 50% £50)");
+            const jbPrize1 = "£100 Bar Tab";
+            const jbPrize2 = "£50 Bar Tab";
+
+            // Set weights: 1 for the two target prizes, 0 for all others
+            config.weightedDistribution = config.weightedDistribution.map(item => {
+                if (item.prize === jbPrize1) {
+                    return { ...item, weight: 1 }; // Equal weight
+                } else if (item.prize === jbPrize2) {
+                    return { ...item, weight: 1 }; // Equal weight
+                } else {
+                    return { ...item, weight: 0 }; // Zero weight for others
+                }
+            });
+
+            // Recalculate the final total weight (should be 2)
+            config.totalWeight = config.weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
+            // Visuals remain the same
+            break;
+
+        case 'standard':
+        default:
+            console.log("Applying STANDARD mode configuration");
+            // Uses the base configuration, no changes needed here
+            break;
+    }
+
+    console.log("Final Configuration for mode:", mode, config);
+    return config;
+}
+
+// Function to apply the chosen configuration
+function applyModeConfiguration() {
+    currentMode = localStorage.getItem(MODE_STORAGE_KEY) || 'standard';
+    console.log(`Loading mode: ${currentMode}`);
+    const config = getModeConfiguration(currentMode);
+    activeWeightedDistribution = config.weightedDistribution;
+    activeVisualSegments = config.visualSegments; // Use the potentially modified visual segments
+    activeTotalWeight = config.totalWeight;
+
+    // IMPORTANT: Redraw the wheel immediately to reflect visual changes (e.g., Joke mode)
+    // We need to ensure drawWheel uses activeVisualSegments
+    drawWheel();
+}
 
 // Section 2 moved up
 
@@ -271,6 +388,9 @@ function drawWheel() {
 
   const offsetRad = initialOffsetDeg * (Math.PI / 180);
 
+  // Use the *active* visual segments for drawing
+  const segmentsToDraw = activeVisualSegments.length === totalVisualSlices ? activeVisualSegments : visualSegments; // Fallback just in case
+
   for (let i = 0; i < totalVisualSlices; i++) {
     const startAngle = i * sliceAngleRad + offsetRad;
     const endAngle = (i + 1) * sliceAngleRad + offsetRad;
@@ -280,7 +400,7 @@ function drawWheel() {
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.closePath();
-    ctx.fillStyle = visualSegments[i].color;
+    ctx.fillStyle = segmentsToDraw[i].color; // Use segment from active config
     ctx.fill();
 
     // Draw text
@@ -291,7 +411,7 @@ function drawWheel() {
     ctx.fillStyle = "#fff";
     ctx.font = "bold 16px Arial"; // Adjust font size as needed
     // Adjust text position (radius - distance from edge, vertical offset)
-    ctx.fillText(visualSegments[i].prize, radius - 10, 5);
+    ctx.fillText(segmentsToDraw[i].prize, radius - 10, 5); // Use prize from active config
     ctx.restore();
   }
 
@@ -397,17 +517,26 @@ function stopIdleRotation() {
 
 // --- Prize Selection ---
 function selectWeightedPrize() {
-  let randomWeight = Math.random() * totalWeight;
-  let cumulativeWeight = 0;
-  for (const item of weightedDistribution) {
-    cumulativeWeight += item.weight;
-    if (randomWeight <= cumulativeWeight) {
-      return item;
-    }
+  // Use the *active* distribution and total weight
+  if (activeTotalWeight <= 0) {
+      console.error("Error: activeTotalWeight is zero or negative. Cannot select prize.");
+      // Return a default or fallback prize to avoid errors
+      return activeWeightedDistribution.find(p => p.prize === "Full Price") || activeWeightedDistribution[0];
   }
-  // Fallback (should not be reached with correct totalWeight)
-  console.warn("Fell through weighted selection, returning last item.");
-  return weightedDistribution[weightedDistribution.length - 1];
+  let randomWeight = Math.random() * activeTotalWeight;
+  let cumulativeWeight = 0;
+  for (const item of activeWeightedDistribution) {
+    // Only consider items with weight > 0
+    if (item.weight > 0) {
+        cumulativeWeight += item.weight;
+        if (randomWeight <= cumulativeWeight) {
+          return item;
+        }
+    } // Closes if (item.weight > 0)
+  } // Closes for loop
+  // Fallback (should ideally not be reached if totalWeight > 0 and weights are correct)
+  console.warn("Fell through weighted selection. Returning first item with weight > 0 or the last item.");
+  return activeWeightedDistribution.find(item => item.weight > 0) || activeWeightedDistribution[activeWeightedDistribution.length - 1];
 }
 
 // --- Spin Animation ---
@@ -426,10 +555,24 @@ function spinWheel() {
 
   // 1. Determine Winning Prize & Target Segment
   const winningPrize = selectWeightedPrize();
-  console.log("Winning Prize:", winningPrize.prize);
+  console.log(`Winning Prize (Mode: ${currentMode}):`, winningPrize.prize, "Weight:", winningPrize.weight);
   const possibleTargetIndices = [];
-  visualSegments.forEach((segment, index) => {
-    if (segment.prize === winningPrize.prize) {
+  // Use the *active* visual segments to find where the winning prize appears visually
+  activeVisualSegments.forEach((segment, index) => {
+    // In Joke mode, the winning prize ("Full Price") might visually appear as "£100 Bar Tab"
+    // So, we need to find the visual segment that *actually represents* the winning prize.
+    // However, the current logic maps the *weighted* prize to *visual* segments with the same name.
+    // This works for Standard, Slow, JB.
+    // For Joke mode, the weighted prize is "Full Price". We need to find the visual segment(s)
+    // that were assigned "Full Price" in getModeConfiguration.
+
+    let prizeToFindVisually = winningPrize.prize;
+    if (currentMode === 'joke') {
+        // The actual winning prize is "Full Price", find where it's visually placed.
+         prizeToFindVisually = "Full Price"; // This was set in getModeConfiguration
+    }
+
+    if (segment.prize === prizeToFindVisually) {
       possibleTargetIndices.push(index);
     }
   });
@@ -659,6 +802,15 @@ document.addEventListener("keydown", function(e) {
 
 // --- Initialisation ---
 console.log("Initialising script...");
-drawWheel(); // Initial draw
+applyModeConfiguration(); // Apply mode settings from localStorage FIRST
+// drawWheel(); // drawWheel is now called within applyModeConfiguration
 animateRainbow(); // Re-enable rainbow animation - this continuously calls drawWheel()
 startIdleRotation(); // Start the wheel's idle rotation on load
+
+// Add event listener to update mode if changed in another tab/window
+window.addEventListener('storage', (event) => {
+    if (event.key === MODE_STORAGE_KEY) {
+        console.log("Detected mode change in localStorage. Reloading configuration.");
+        applyModeConfiguration();
+    }
+});
