@@ -7,7 +7,7 @@ const winsList = document.getElementById("winsList");
 const MAX_RECENT_WINS = 5;  // Reduced from 10 to 5 to fit without scrolling
 
 const PARTICLE_COUNT = 200; // Increased further from 100
-const MAJOR_PRIZES = ["£100 Bar Tab", "£50 Bar Tab", "£25 Bar Tab", "Free Round"];
+const MAJOR_PRIZES = ["£1000 Bar Tab"];
 
 // Constants for spin animation (Original values - may be overridden by rewritten logic below)
 let spinAnimation = null; // Keep for potential reference? Rewritten logic uses spinAnimationFrame
@@ -77,33 +77,14 @@ const totalVisualSlices = 32;
 const visualSegments = new Array(totalVisualSlices);
 const initialOffsetDeg = -90; // Start with the line between slice 0 and 31 at the top
 
-// Fixed assignments:
-visualSegments[0]  = { prize: "£100 Bar Tab", color: "#e5cb5d" };
-visualSegments[16] = { prize: "£50 Bar Tab", color: "#f64649" };
-visualSegments[4]  = { prize: "Free Round", color: "#8549f6" };
-visualSegments[12] = { prize: "Free Round", color: "#8549f6" };
-visualSegments[20] = { prize: "Free Round", color: "#8549f6" };
-visualSegments[28] = { prize: "Free Round", color: "#8549f6" };
-visualSegments[8]  = { prize: "£25 Bar Tab", color: "#d12de6" };
-visualSegments[24] = { prize: "£25 Bar Tab", color: "#d12de6" };
-visualSegments[7]  = { prize: "25% Off", color: "#2c41af" };
-visualSegments[9]  = { prize: "25% Off", color: "#2c41af" };
-visualSegments[23] = { prize: "25% Off", color: "#2c41af" };
-visualSegments[25] = { prize: "25% Off", color: "#2c41af" };
-visualSegments[1]  = { prize: "Half Price Round", color: "#4b68ff" };
-visualSegments[15] = { prize: "Half Price Round", color: "#4b68ff" };
-visualSegments[17] = { prize: "Half Price Round", color: "#4b68ff" };
-visualSegments[31] = { prize: "Half Price Round", color: "#4b68ff" };
-// Remaining indices (16 total):
-const remainingIndices = [2,3,5,6,10,11,13,14,18,19,21,22,26,27,29,30];
-const freeRoundNeighbors = new Set([3,5,11,13,19,21,27,29]);
-freeRoundNeighbors.forEach(idx => {
-  visualSegments[idx] = { prize: "Full Price", color: "#333333" };
-});
-const leftover = remainingIndices.filter(idx => !freeRoundNeighbors.has(idx));
-leftover.sort((a, b) => a - b);
-for (let idx of leftover) {
-  visualSegments[idx] = { prize: "10% Off", color: "#2a2f5b" };
+// Set only one segment as Full Price (segment 16)
+visualSegments[16] = { prize: "Full Price", color: "#333333" };
+
+// Make all other segments £1000 Bar Tab
+for (let i = 0; i < totalVisualSlices; i++) {
+  if (i !== 16) {  // Skip the Full Price segment
+    visualSegments[i] = { prize: "£1000 Bar Tab", color: "#e5cb5d" };
+  }
 }
 
 let rainbowAngle = 0; // For rainbow border animation (Moved Up)
@@ -220,14 +201,8 @@ updateWinsList();
 // 1. True Weighted Distribution
 // ------------------------------------------------------------------
 const weightedDistribution = [
-  { prize: "£100 Bar Tab", weight: 1, color: "#e5cb5d" },
-  { prize: "£50 Bar Tab", weight: 2, color: "#f64649" },
-  { prize: "£25 Bar Tab", weight: 4, color: "#d12de6" },
-  { prize: "Free Round", weight: 12, color: "#8549f6" },
-  { prize: "Half Price Round", weight: 25, color: "#4b68ff" },
-  { prize: "25% Off", weight: 50, color: "#2c41af" },
-  { prize: "10% Off", weight: 150, color: "#2a2f5b" },
-  { prize: "Full Price", weight: 243, color: "#333333" }
+  { prize: "£1000 Bar Tab", weight: 0, color: "#e5cb5d" },
+  { prize: "Full Price", weight: 1, color: "#333333" }
 ];
 const totalWeight = weightedDistribution.reduce((sum, p) => sum + p.weight, 0);
 
@@ -542,7 +517,6 @@ function showPrizeModal(winningPrize) {
   prizeModal.style.left = `${wheelRect.left + wheelRect.width / 2}px`;
   prizeModal.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
   prizeModal.style.transform = 'translate(-50%, -50%) scale(0.8)'; // Center and prepare
-
   const isFullPrice = winningPrize.prize === "Full Price";
   const prizeDisplay = isFullPrice ? "Full Price" : winningPrize.prize; // Keep prize name for main text
   const headerText = isFullPrice ? "Unlucky!" : "Congratulations!"; // Conditional header
