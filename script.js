@@ -323,6 +323,33 @@ function getModeConfiguration(mode) {
             // Visuals remain the same
             break;
 
+        case 'double':
+            console.log("Applying DOUBLE mode configuration");
+            // Weights remain standard
+            config.weightedDistribution = deepCopy(baseWeightedDistribution);
+            config.totalWeight = baseTotalWeight;
+            // Visuals are modified
+            config.visualSegments = config.visualSegments.map(segment => {
+                let newPrize = segment.prize;
+                if (segment.prize.startsWith('£')) {
+                    // Use regex to find the number after £
+                    const match = segment.prize.match(/£(\d+)/);
+                    if (match && match[1]) {
+                        const value = parseInt(match[1], 10);
+                        newPrize = segment.prize.replace(`£${value}`, `£${value * 2}`);
+                    }
+                } else if (segment.prize === "10% Off") {
+                    newPrize = "20% Off";
+                } else if (segment.prize === "25% Off") {
+                    newPrize = "50% Off";
+                } else if (segment.prize === "Full Price") {
+                    newPrize = "Double Price";
+                }
+                // Keep original color etc.
+                return { ...segment, prize: newPrize };
+            });
+            break;
+
         case 'standard':
         default:
             console.log("Applying STANDARD mode configuration");
