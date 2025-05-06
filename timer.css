@@ -1,0 +1,410 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@keyframes backgroundPulse {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes logoGlow {
+  0% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
+  50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 50px rgba(255, 140, 0, 0.7)); }
+  100% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.7); }
+  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 215, 0, 0.7); }
+  100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.7); }
+}
+
+body {
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("gold-room.webp") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.game-container {
+  width: 90%;
+  max-width: 900px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  padding: 40px 40px 50px 40px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  animation: fadeIn 1s ease-out;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.ivorson-logo {
+  width: 350px;
+  height: auto;
+  margin: 10px 0;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+  animation: logoGlow 4s infinite, pulse 6s infinite;
+}
+
+.game-title {
+  margin-bottom: 40px;
+}
+
+.game-title h1 {
+  font-size: 3rem;
+  text-transform: uppercase;
+  color: #FFD700;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+.timer-display {
+  font-size: 8rem;
+  font-weight: bold;
+  font-family: 'Digital-7', monospace;
+  color: #FF4500;
+  text-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+  background: linear-gradient(to right, #FF4500, #FFD700, #FF4500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 30px 0 40px 0; /* Increased bottom margin to account for removed game status */
+  animation: pulse 1s infinite;
+}
+
+.game-status {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #FFFFFF;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.start-button {
+  background: linear-gradient(45deg, #FF4500, #FFD700);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.8rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 30px auto 0;
+  box-shadow: 0 4px 15px rgba(255, 69, 0, 0.5);
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  animation: glow 2s infinite;
+  display: block; /* Make it a block element */
+}
+
+.start-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 7px 20px rgba(255, 69, 0, 0.7);
+}
+
+.start-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(255, 69, 0, 0.5);
+}
+
+.stop-button {
+  background: linear-gradient(45deg, #FF0000, #CC0000) !important;
+  animation: pulse 0.5s infinite !important;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(26,26,26,0.7), rgba(51,51,51,0.7));
+  padding: 40px;
+  position: relative;
+  z-index: 999; /* Just below the particle canvas */
+  border-radius: 20px;
+  max-width: 600px;
+  width: 80%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.7);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  animation: slideInUp 0.5s ease-out;
+}
+
+.result-header {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.win-header {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  animation: pulse 1s infinite;
+}
+
+.lose-header {
+  color: #FF4500;
+  animation: shake 0.5s;
+}
+
+.result-text {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+}
+
+.result-timing {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  color: #CCCCCC;
+}
+
+.play-again-button {
+  background: linear-gradient(45deg, #333, #666);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.play-again-button:hover {
+  background: linear-gradient(45deg, #444, #777);
+  transform: translateY(-3px);
+}
+
+/* Particle canvas */
+#particleCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000; /* Much higher z-index to be on top of everything */
+  pointer-events: none;
+}
+
+/* Mute button */
+.mute-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  z-index: 1000;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  line-height: 1;
+}
+
+.mute-button:hover {
+  opacity: 1;
+}
+
+.mute-button .icon-muted {
+  display: none;
+}
+
+.mute-button.muted .icon-unmuted {
+  display: none;
+}
+
+.mute-button.muted .icon-muted {
+  display: inline;
+}
+
+/* Responsibility logos footer */
+.responsibility-footer {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 5;
+}
+
+.responsibility-logo {
+  height: 40px;
+  opacity: 0.8;
+}
+
+.back-to-wheel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(45deg, #222, #444);
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.back-to-wheel:hover {
+  background: linear-gradient(45deg, #333, #555);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Game state specific styles */
+.game-active .timer-display {
+  animation: pulse 0.5s infinite;
+  color: #FF4500;
+}
+
+.game-close .timer-display {
+  animation: pulse 0.3s infinite;
+  color: #FFA500;
+}
+
+.game-critical .timer-display {
+  animation: pulse 0.2s infinite;
+  color: #FFD700;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .game-title h1 {
+    font-size: 2.2rem;
+  }
+  
+  .timer-display {
+    font-size: 6rem;
+  }
+    .game-status {
+    font-size: 1.2rem;
+    height: 0;
+    margin: 0;
+  }
+  
+  .start-button {
+    font-size: 1.5rem;
+    padding: 12px 30px;
+  }
+  
+  .result-header {
+    font-size: 2.5rem;
+  }
+  
+  .result-text {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-container {
+    padding: 20px;
+  }
+  
+  .game-title h1 {
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .timer-display {
+    font-size: 5rem;
+  }
+  
+  .start-button {
+    font-size: 1.3rem;
+    padding: 10px 25px;
+  }
+  
+  .responsibility-logo {
+    height: 30px;
+  }
+}

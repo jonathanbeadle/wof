@@ -1,0 +1,310 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const timerDisplay = document.getElementById('timerDisplay');
+    const gameStatus = document.getElementById('gameStatus');
+    const startButton = document.getElementById('startButton');
+    const resultModal = document.getElementById('resultModal');
+    const resultHeader = document.getElementById('resultHeader');
+    const resultText = document.getElementById('resultText');
+    const resultTiming = document.getElementById('resultTiming');
+    const playAgainButton = document.getElementById('playAgainButton');
+    const particleCanvas = document.getElementById('particleCanvas');
+    const particleCtx = particleCanvas.getContext('2d');
+    const muteButton = document.getElementById('muteButton');
+
+    // Audio elements
+    const tickSound = document.getElementById('tickSound');
+    const winSound = document.getElementById('winSound');
+    const loseSound = document.getElementById('loseSound');
+    const tensionSound = document.getElementById('tensionSound');
+
+    // Set initial volumes
+    tickSound.volume = 0.3;
+    winSound.volume = 0.7;
+    loseSound.volume = 0.5;
+    tensionSound.volume = 0.4;
+
+    // Game state
+    let gameState = {
+        isRunning: false,
+        startTime: 0,
+        currentTime: 0,
+        tickInterval: null,
+        targetTime: 10.00, // Target is exactly 10 seconds
+        isMuted: false
+    };
+
+    // Set up the particle canvas dimensions
+    function resizeCanvas() {
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Particles system
+    class Particle {
+        constructor(x, y, color, size, speedX, speedY) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = size;
+            this.speedX = speedX;
+            this.speedY = speedY;
+            this.gravity = 0.05;
+            this.friction = 0.99;
+            this.life = 100; // Life span of the particle
+        }
+
+        update() {
+            this.speedY += this.gravity;
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.speedX *= this.friction;
+            this.speedY *= this.friction;
+            this.life -= 1;
+            return this.life > 0;
+        }
+
+        draw() {
+            particleCtx.globalAlpha = this.life / 100;
+            particleCtx.fillStyle = this.color;
+            particleCtx.beginPath();
+            particleCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            particleCtx.closePath();
+            particleCtx.fill();
+        }
+    }
+
+    let particles = [];
+
+    // Create explosion effect
+    function createExplosion(x, y, count, isWin) {
+        const colors = isWin ? 
+            ['#FFD700', '#FFA500', '#FF4500', '#FF0000', '#FFFF00'] : 
+            ['#FF4500', '#FF6347', '#FF0000', '#8B0000', '#A9A9A9'];
+            
+        for (let i = 0; i < count; i++) {
+            const size = Math.random() * 8 + 2;
+            const speedX = (Math.random() - 0.5) * 10;
+            const speedY = (Math.random() - 0.5) * 10;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particles.push(new Particle(x, y, color, size, speedX, speedY));
+        }
+    }
+
+    // Update and draw all particles
+    function updateParticles() {
+        particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        
+        // Update and filter out dead particles
+        particles = particles.filter(particle => {
+            const isAlive = particle.update();
+            if (isAlive) particle.draw();
+            return isAlive;
+        });
+        
+        if (particles.length > 0) {
+            requestAnimationFrame(updateParticles);
+        }
+    }
+
+    // Format time to display two decimal places (seconds.centiseconds)    function formatTime(timeInSeconds) {
+        const seconds = Math.floor(timeInSeconds);
+        const centiseconds = Math.floor((timeInSeconds - seconds) * 100);
+        return `${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Start the game timer
+    function startGame() {
+        if (gameState.isRunning) return;
+        
+        gameState.isRunning = true;
+        gameState.startTime = Date.now();
+        startButton.textContent = "STOP";
+        startButton.classList.add('stop-button');
+        gameStatus.textContent = "Click again when you think it's exactly 10.00 seconds!";
+        
+        if (!gameState.isMuted) {
+            tensionSound.currentTime = 0;
+            tensionSound.play();
+        }
+        
+        // Change the color and animation of the timer as we get closer to 10 seconds
+        timerDisplay.classList.add('game-active');
+        
+        gameState.tickInterval = setInterval(() => {
+            const elapsedMs = Date.now() - gameState.startTime;
+            gameState.currentTime = elapsedMs / 1000;
+            timerDisplay.textContent = formatTime(gameState.currentTime);
+            
+            // Play tick sound every second
+            if (Math.floor(gameState.currentTime) > Math.floor((elapsedMs - 100) / 1000) && !gameState.isMuted) {
+                tickSound.currentTime = 0;
+                tickSound.play();
+            }
+            
+            // Change visual feedback as we approach 10 seconds
+            if (gameState.currentTime >= 8 && gameState.currentTime < 9) {
+                timerDisplay.classList.remove('game-active');
+                timerDisplay.classList.add('game-close');
+            } else if (gameState.currentTime >= 9) {
+                timerDisplay.classList.remove('game-close');
+                timerDisplay.classList.add('game-critical');
+            }
+            
+            // Auto-stop if we go way over time (15 seconds)
+            if (gameState.currentTime > 15) {
+                stopGame();
+            }
+        }, 10); // Update every 10ms for smooth display
+    }
+
+    // Stop the game and check the result
+    function stopGame() {
+        if (!gameState.isRunning) return;
+        
+        clearInterval(gameState.tickInterval);
+        gameState.isRunning = false;
+        
+        const finalTime = gameState.currentTime;
+        const difference = Math.abs(finalTime - gameState.targetTime);
+        const isWin = difference < 0.05; // Win if within 0.05 seconds of 10.00
+        
+        tensionSound.pause();
+        
+        // Display the result
+        resultHeader.textContent = isWin ? "YOU WIN!" : "SO CLOSE!";
+        resultHeader.className = 'result-header ' + (isWin ? 'win-header' : 'lose-header');
+        
+        resultText.textContent = isWin 
+            ? "CONGRATULATIONS! You've won free drinks!" 
+            : "You missed the 10-second mark!";
+        
+        resultTiming.textContent = `Your time: ${formatTime(finalTime)} seconds`;
+        
+        // Play sound effect
+        if (!gameState.isMuted) {
+            if (isWin) {
+                winSound.currentTime = 0;
+                winSound.play();
+            } else {
+                loseSound.currentTime = 0;
+                loseSound.play();
+            }
+        }
+        
+        // Show result modal with slight delay
+        setTimeout(() => {
+            resultModal.style.display = 'flex';
+        }, 500);
+        
+        // Create particle effect in the center of the screen
+        if (isWin) {
+            createWinExplosions();
+        } else {
+            createExplosion(
+                particleCanvas.width / 2, 
+                particleCanvas.height / 2, 
+                100, 
+                false
+            );
+        }
+        
+        updateParticles();
+    }
+
+    // Create multiple explosions for a win
+    function createWinExplosions() {
+        // Create a big center explosion
+        createExplosion(
+            particleCanvas.width / 2, 
+            particleCanvas.height / 2, 
+            200, 
+            true
+        );
+        
+        // Create corner explosions
+        createExplosion(0, 0, 50, true);
+        createExplosion(particleCanvas.width, 0, 50, true);
+        createExplosion(0, particleCanvas.height, 50, true);
+        createExplosion(particleCanvas.width, particleCanvas.height, 50, true);
+        
+        // Create more random explosions
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                const x = Math.random() * particleCanvas.width;
+                const y = Math.random() * particleCanvas.height;
+                createExplosion(x, y, 100, true);
+            }, i * 300);
+    }
+    }
+    
+    // Reset the game to play again
+    function resetGame() {
+        timerDisplay.textContent = "00.00";
+        gameStatus.textContent = "Click anywhere to start!";
+        startButton.textContent = "START GAME";
+        startButton.classList.remove('stop-button');
+        resultModal.style.display = 'none';
+        
+        // Reset timer classes
+        timerDisplay.classList.remove('game-active', 'game-close', 'game-critical');
+        
+        // Clear any remaining particles
+        particles = [];
+        particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+
+        // Reset game state
+        gameState.isRunning = false;
+    }
+
+    // Toggle mute state
+    function toggleMute() {
+        gameState.isMuted = !gameState.isMuted;
+        muteButton.classList.toggle('muted', gameState.isMuted);
+        
+        // Set volume for all audio elements
+        const volume = gameState.isMuted ? 0 : 0.5;
+        tickSound.volume = gameState.isMuted ? 0 : 0.3;
+        winSound.volume = gameState.isMuted ? 0 : 0.7;
+        loseSound.volume = gameState.isMuted ? 0 : 0.5;
+        tensionSound.volume = gameState.isMuted ? 0 : 0.4;
+    }    // Event listeners
+    startButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent body click from triggering
+        if (!gameState.isRunning) {
+            startGame();
+        } else {
+            stopGame();
+        }
+    });
+
+    // Simplified click handling
+    document.addEventListener('click', function(e) {
+        // Don't trigger if clicking on buttons or modal
+        if (e.target.tagName !== 'BUTTON' && !resultModal.contains(e.target)) {
+            if (!gameState.isRunning) {
+                startGame();
+            } else {
+                stopGame();
+            }
+        }
+    });
+
+    resultModal.addEventListener('click', (e) => {
+        // Prevent clicks on the modal from propagating to body
+        e.stopPropagation();
+    });
+
+    playAgainButton.addEventListener('click', resetGame);
+    
+    muteButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent body click
+        toggleMute();
+    });
+
+    // Initialize the game
+    resetGame();
+});

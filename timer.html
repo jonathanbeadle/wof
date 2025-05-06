@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10-Second Challenge - The Ivorson Pub</title>
+  <link rel="stylesheet" href="timer.css" />
+</head>
+<body>
+  <!-- Mute Button with Icons -->
+  <button id="muteButton" class="mute-button">
+      <span class="icon-unmuted">🔊</span>
+      <span class="icon-muted">🔇</span>
+  </button>
+  <div class="container">
+    <div class="game-container">      <div class="logo-container">
+        <img src="logo1.png" alt="The Ivorson Logo" class="ivorson-logo">
+      </div>
+      <div class="game-title">        <h1>The 10-Second Challenge</h1>
+        <p class="subtitle">Stop on EXACTLY 10 seconds to win a FREE ROUND!</p>
+      </div>      <div class="timer-display" id="timerDisplay">00.00</div>
+      <div class="game-status" id="gameStatus"></div>
+      <button id="startButton" class="start-button">START GAME</button>
+    </div>
+  </div>
+
+  <!-- Result Modal -->  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <div id="resultHeader" class="result-header">Result</div>
+      <div id="resultText" class="result-text"></div>
+      <div id="resultTiming" class="result-timing"></div>
+    </div>
+  </div>
+
+  <!-- Canvas for the particles -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Audio elements -->
+  <audio id="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/677/677-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="loseSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/221/221-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="tensionSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/796/796-preview.mp3" type="audio/mpeg">
+  </audio>  <div class="responsibility-footer">
+    <img src="drink-responsibly.png" alt="Drink Responsibly" class="responsibility-logo">
+    <img src="Drinkaware_logo_URL_RGB.webp" alt="Drinkaware" class="responsibility-logo">
+  </div>
+
+  <script src="timer.js"></script>
+</body>
+</html>

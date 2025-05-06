@@ -12,6 +12,16 @@ let currentMode = 'standard'; // Default mode
 let activeWeightedDistribution = [];
 let activeVisualSegments = [];
 let activeTotalWeight = 0;
+
+// Check if we need to redirect to the timer game
+document.addEventListener('DOMContentLoaded', () => {
+    const selectedMode = localStorage.getItem(MODE_STORAGE_KEY);
+    if (selectedMode === 'timer') {
+        window.location.href = 'timer.html';
+        return;
+    }
+    currentMode = selectedMode || 'standard';
+});
 // --------------------------
 
 const PARTICLE_COUNT = 200; // Increased further from 100
