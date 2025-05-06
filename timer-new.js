@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const tickSound = document.getElementById('tickSound');
     const winSound = document.getElementById('winSound');
     const loseSound = document.getElementById('loseSound');
-    const tensionSound = document.getElementById('tensionSound');    // Set initial volumes
+    const tensionSound = document.getElementById('tensionSound');
+
+    // Set initial volumes
     tickSound.volume = 0.3;
     winSound.volume = 0.7;
     loseSound.volume = 0.5;
-    tensionSound.volume = 0.2; // Reduced from 0.4 to make less distracting
+    tensionSound.volume = 0.4;
 
     // Game state
     let gameState = {
@@ -75,24 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let particles = [];    // Create explosion effect
-    function createExplosion(x, y, count, winType) {
-        // Different color schemes based on win type
-        let colors;
-        if (winType === 'free') { // Free drinks - gold/yellow/red
-            colors = ['#FFD700', '#FFA500', '#FF4500', '#FF0000', '#FFFF00'];
-        } else if (winType === '25off') { // 25% off - blue/cyan/purple
-            colors = ['#4169E1', '#00BFFF', '#1E90FF', '#6495ED', '#9370DB'];
-        } else if (winType === '10off') { // 10% off - lighter blues
-            colors = ['#87CEEB', '#ADD8E6', '#B0E0E6', '#00BFFF', '#87CEFA'];
-        } else { // No win - grays and reds
-            colors = ['#FF4500', '#FF6347', '#FF0000', '#8B0000', '#A9A9A9'];
-        }
+    let particles = [];
+
+    // Create explosion effect
+    function createExplosion(x, y, count, isWin) {
+        const colors = isWin ? 
+            ['#FFD700', '#FFA500', '#FF4500', '#FF0000', '#FFFF00'] : 
+            ['#FF4500', '#FF6347', '#FF0000', '#8B0000', '#A9A9A9'];
             
         for (let i = 0; i < count; i++) {
-            const size = Math.random() * (winType === 'free' ? 12 : 8) + 4; // Smaller particles for non-free wins
-            const speedX = (Math.random() - 0.5) * (winType === 'free' ? 15 : 10); // Slower for non-free wins
-            const speedY = (Math.random() - 0.5) * (winType === 'free' ? 15 : 10); // Slower for non-free wins
+            const size = Math.random() * 12 + 4; // Larger particles (was 8+2)
+            const speedX = (Math.random() - 0.5) * 15; // Faster horizontal speed for wider spread
+            const speedY = (Math.random() - 0.5) * 15; // Faster vertical speed for higher/lower travel
             const color = colors[Math.floor(Math.random() * colors.length)];
             particles.push(new Particle(x, y, color, size, speedX, speedY));
         }
@@ -219,13 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 loseSound.play();
             }
         }
-          // Only create particle effect for wins, with different effects based on win type
-        if (isExactWin) {
-            createWinExplosions('free'); // Free drinks - full spectacular fireworks
-        } else if (is25PercentWin) {
-            createWinExplosions('25off'); // 25% off - moderate blue fireworks
-        } else if (is10PercentWin) {
-            createWinExplosions('10off'); // 10% off - muted blue fireworks
+        
+        // Only create particle effect for wins
+        if (isWin) {
+            createWinExplosions();
         }
         
         updateParticles();
@@ -240,81 +233,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetGame();
             }, 5000);
         }, 500);
-    }    // Create multiple explosions for a win
-    function createWinExplosions(winType = 'free') {
-        // Configure settings based on win type
-        let settings = {
-            centerCount: 300,
-            cornerCount: 75,
-            randomExplosions: 12,
-            randomParticles: 150,
-            secondWave: true,
-            secondWaveDelay: 2000,
-            secondWaveCount: 250,
-            additionalRandom: 5
-        };
-        
-        // Adjust settings based on win type
-        if (winType === '25off') {
-            // 25% off - moderate blue fireworks
-            settings.centerCount = 200;
-            settings.cornerCount = 50;
-            settings.randomExplosions = 8;
-            settings.randomParticles = 100;
-            settings.secondWaveCount = 150;
-            settings.additionalRandom = 3;
-        } else if (winType === '10off') {
-            // 10% off - muted blue fireworks
-            settings.centerCount = 150;
-            settings.cornerCount = 35;
-            settings.randomExplosions = 5;
-            settings.randomParticles = 70;
-            settings.secondWave = false;
-        }
-        
+    }
+
+    // Create multiple explosions for a win
+    function createWinExplosions() {
         // Create a big center explosion
         createExplosion(
             particleCanvas.width / 2, 
             particleCanvas.height / 2, 
-            settings.centerCount,
-            winType
+            300, // Increased from 200
+            true
         );
         
         // Create corner explosions
-        createExplosion(0, 0, settings.cornerCount, winType);
-        createExplosion(particleCanvas.width, 0, settings.cornerCount, winType);
-        createExplosion(0, particleCanvas.height, settings.cornerCount, winType);
-        createExplosion(particleCanvas.width, particleCanvas.height, settings.cornerCount, winType);
+        createExplosion(0, 0, 75, true); // Increased from 50
+        createExplosion(particleCanvas.width, 0, 75, true);
+        createExplosion(0, particleCanvas.height, 75, true);
+        createExplosion(particleCanvas.width, particleCanvas.height, 75, true);
         
-        // Create more random explosions
-        for (let i = 0; i < settings.randomExplosions; i++) {
+        // Create more random explosions - increased count and duration
+        for (let i = 0; i < 12; i++) { // Increased from 5 to 12 explosions
             setTimeout(() => {
                 const x = Math.random() * particleCanvas.width;
                 const y = Math.random() * particleCanvas.height;
-                createExplosion(x, y, settings.randomParticles, winType);
-            }, i * 400);
+                createExplosion(x, y, 150, true); // Increased from 100 to 150 particles
+            }, i * 400); // Spread out over longer time (was 300ms)
         }
         
-        // Add a second wave of explosions only for better wins
-        if (settings.secondWave) {
-            setTimeout(() => {
-                createExplosion(
-                    particleCanvas.width / 2, 
-                    particleCanvas.height / 2, 
-                    settings.secondWaveCount,
-                    winType
-                );
-                
-                // Add a few more random ones
-                for (let i = 0; i < settings.additionalRandom; i++) {
-                    setTimeout(() => {
-                        const x = Math.random() * particleCanvas.width;
-                        const y = Math.random() * particleCanvas.height;
-                        createExplosion(x, y, 100, winType);
-                    }, i * 300 + 500);
-                }
-            }, settings.secondWaveDelay);
-        }
+        // Add a second wave of explosions
+        setTimeout(() => {
+            createExplosion(
+                particleCanvas.width / 2, 
+                particleCanvas.height / 2, 
+                250,
+                true
+            );
+            
+            // Add a few more random ones
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * particleCanvas.width;
+                    const y = Math.random() * particleCanvas.height;
+                    createExplosion(x, y, 100, true);
+                }, i * 300 + 500);
+            }
+        }, 2000); // Second wave after 2 seconds
     }
 
     // Reset the game to play again
