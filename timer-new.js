@@ -192,11 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
             resultHeader.textContent = "YOU WIN!";
             resultText.innerHTML = "CONGRATULATIONS!<br>You've Won Free Drinks!";
         } else if (is25PercentWin) {
-            resultHeader.textContent = "ALMOST PERFECT!";
-            resultText.innerHTML = "NICE!<br>You've Won 25% OFF!";
+            resultHeader.textContent = "ALMOST...";
+            resultText.innerHTML = "You've Won 25% OFF!";
         } else if (is10PercentWin) {
-            resultHeader.textContent = "GOOD TRY!";
-            resultText.innerHTML = "WELL DONE!<br>You've Won 10% OFF!";
+            resultHeader.textContent = "NICE TRY!";
+            resultText.innerHTML = "You've Won 10% OFF!";
         } else {
             resultHeader.textContent = isWayOff ? "USELESS" : "SO CLOSE!";
             resultText.innerHTML = isWayOff ? "You were nowhere near!" : "You didn't hit close enough!";
