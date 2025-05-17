@@ -170,13 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.isRunning = false;
         
         const finalTime = gameState.currentTime;
-        
-        // Check how far off they were from 10 seconds
+          // Check how far off they were from 10 seconds
         const timeOffset = Math.abs(finalTime - 10.00);
         
         // Determine win category based on precision
-        const isExactWin = Math.round(finalTime * 100) / 100 === 10.00; // Exactly 10.00
-        const is25PercentWin = timeOffset <= 0.01 && !isExactWin; // Within 0.01 but not exactly 10.00
+        const isExactWin = timeOffset < 0.005; // Consider anything within 0.005 as exact 10.00
+        const is25PercentWin = timeOffset <= 0.01 && timeOffset >= 0.005; // Within 0.01 but not exactly 10.00
         const is10PercentWin = timeOffset <= 0.05 && !is25PercentWin && !isExactWin; // Within 0.05
         const isWin = isExactWin || is25PercentWin || is10PercentWin; // Any type of win
         const isWayOff = timeOffset > 1.00;
