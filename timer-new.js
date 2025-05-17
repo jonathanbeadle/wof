@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultText.innerHTML = "You've Won 10% OFF!";
         } else {
             resultHeader.textContent = isWayOff ? "USELESS" : "SO CLOSE!";
-            resultText.innerHTML = isWayOff ? "You were nowhere near!" : "You didn't get close enough!";
+            resultText.innerHTML = isWayOff ? "You were nowhere near!" : "But not close enough!";
         }
         
         resultHeader.className = 'result-header ' + (isWin ? 'win-header' : 'lose-header');
