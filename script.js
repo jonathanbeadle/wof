@@ -13,11 +13,15 @@ let activeWeightedDistribution = [];
 let activeVisualSegments = [];
 let activeTotalWeight = 0;
 
-// Check if we need to redirect to the timer game
+// Check if we need to redirect to other games
 document.addEventListener('DOMContentLoaded', () => {
     const selectedMode = localStorage.getItem(MODE_STORAGE_KEY);
     if (selectedMode === 'timer') {
         window.location.href = 'timer.html';
+        return;
+    }
+    if (selectedMode === 'darts') {
+        window.location.href = 'darts.html';
         return;
     }
     currentMode = selectedMode || 'standard';
