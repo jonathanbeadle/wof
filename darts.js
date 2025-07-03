@@ -1,3 +1,14 @@
+// ========================================
+// BULLSEYE DIFFICULTY CONFIGURATION
+// ========================================
+// Adjust this single value to make the bullseye easier or harder to hit:
+// 25 = Normal difficulty (default dartboard size)
+// 30-40 = Easier (larger bullseye)
+// 15-20 = Harder (smaller bullseye)
+// 10 = Very hard (tiny bullseye)
+const BULLSEYE_DIFFICULTY_RADIUS = 25;
+// ========================================
+
 class DartsGame {
     constructor() {
         this.canvas = document.getElementById('dartboardCanvas');
@@ -25,7 +36,7 @@ class DartsGame {
         this.gameState = 'waiting'; // waiting, aimingX, aimingY, thrown, finished
         this.isMuted = false;
         this.dartboardRadius = 390;
-        this.bullseyeRadius = 25; // Inner bull (actual bullseye)
+        this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS; // Use configurable radius
         this.outerBullRadius = 60; // Outer bull (25 point area)
         this.aimPosition = { x: 0, y: 0 };
         this.currentAimPos = { x: 0, y: 0 };
@@ -52,6 +63,9 @@ class DartsGame {
         this.setupMuteButton();
         this.startParticleSystem();
         
+        // Log current bullseye difficulty setting
+        console.log(`🎯 Darts Game Initialized - Bullseye Radius: ${BULLSEYE_DIFFICULTY_RADIUS}px (${BULLSEYE_DIFFICULTY_RADIUS > 30 ? 'EASY' : BULLSEYE_DIFFICULTY_RADIUS > 20 ? 'NORMAL' : BULLSEYE_DIFFICULTY_RADIUS > 15 ? 'HARD' : 'VERY HARD'})`);
+        
         // Game ready - no status text needed
     }
     
@@ -60,7 +74,7 @@ class DartsGame {
         this.canvas.width = 800;
         this.canvas.height = 800;
         this.dartboardRadius = 380; // Leave some margin
-        this.bullseyeRadius = 25; // Inner bull
+        this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS; // Use configurable radius
         this.outerBullRadius = 60; // Outer bull
         
         // Set up particle canvas
@@ -72,8 +86,11 @@ class DartsGame {
             this.canvas.width = window.innerWidth < 768 ? 500 : 650;
             this.canvas.height = this.canvas.width;
             this.dartboardRadius = this.canvas.width / 2 - 20;
-            this.bullseyeRadius = this.dartboardRadius * 0.065;
-            this.outerBullRadius = this.dartboardRadius * 0.15;
+            
+            // Scale the configurable bullseye radius proportionally for smaller screens
+            const scaleFactor = this.dartboardRadius / 380; // Ratio compared to full size
+            this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS * scaleFactor;
+            this.outerBullRadius = 60 * scaleFactor;
         }
     }
     
@@ -175,6 +192,7 @@ class DartsGame {
         this.ctx.stroke();
         
         // Draw inner bull (bullseye - 50 points) - red
+        // This uses the configurable BULLSEYE_DIFFICULTY_RADIUS
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, this.bullseyeRadius, 0, 2 * Math.PI);
         this.ctx.fillStyle = '#CC0000';
