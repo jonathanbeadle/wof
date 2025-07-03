@@ -3,10 +3,14 @@
 // ========================================
 // Adjust this single value to make the bullseye easier or harder to hit:
 // 25 = Normal difficulty (default dartboard size)
-// 30-40 = Easier (larger bullseye)
-// 15-20 = Harder (smaller bullseye)
-// 10 = Very hard (tiny bullseye)
-const BULLSEYE_DIFFICULTY_RADIUS = 25;
+// 30-40 = Easier (larger bullseye and outer bull)
+// 15-20 = Harder (smaller bullseye and outer bull)
+// 10 = Very hard (tiny bullseye and outer bull)
+const BULLSEYE_DIFFICULTY_RADIUS = 15;
+
+// Outer bull will be automatically calculated as 2.4x the inner bull radius
+// (maintains realistic dartboard proportions)
+const OUTER_BULL_MULTIPLIER = 2.4;
 // ========================================
 
 class DartsGame {
@@ -37,7 +41,7 @@ class DartsGame {
         this.isMuted = false;
         this.dartboardRadius = 390;
         this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS; // Use configurable radius
-        this.outerBullRadius = 60; // Outer bull (25 point area)
+        this.outerBullRadius = BULLSEYE_DIFFICULTY_RADIUS * OUTER_BULL_MULTIPLIER; // Proportional outer bull
         this.aimPosition = { x: 0, y: 0 };
         this.currentAimPos = { x: 0, y: 0 };
         this.animationId = null;
@@ -64,7 +68,7 @@ class DartsGame {
         this.startParticleSystem();
         
         // Log current bullseye difficulty setting
-        console.log(`🎯 Darts Game Initialized - Bullseye Radius: ${BULLSEYE_DIFFICULTY_RADIUS}px (${BULLSEYE_DIFFICULTY_RADIUS > 30 ? 'EASY' : BULLSEYE_DIFFICULTY_RADIUS > 20 ? 'NORMAL' : BULLSEYE_DIFFICULTY_RADIUS > 15 ? 'HARD' : 'VERY HARD'})`);
+        console.log(`🎯 Darts Game Initialized - Inner Bull: ${BULLSEYE_DIFFICULTY_RADIUS}px, Outer Bull: ${Math.round(BULLSEYE_DIFFICULTY_RADIUS * OUTER_BULL_MULTIPLIER)}px (${BULLSEYE_DIFFICULTY_RADIUS > 30 ? 'EASY' : BULLSEYE_DIFFICULTY_RADIUS > 20 ? 'NORMAL' : BULLSEYE_DIFFICULTY_RADIUS > 15 ? 'HARD' : 'VERY HARD'})`);
         
         // Game ready - no status text needed
     }
@@ -75,7 +79,7 @@ class DartsGame {
         this.canvas.height = 800;
         this.dartboardRadius = 380; // Leave some margin
         this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS; // Use configurable radius
-        this.outerBullRadius = 60; // Outer bull
+        this.outerBullRadius = BULLSEYE_DIFFICULTY_RADIUS * OUTER_BULL_MULTIPLIER; // Proportional outer bull
         
         // Set up particle canvas
         this.particleCanvas.width = window.innerWidth;
@@ -87,10 +91,10 @@ class DartsGame {
             this.canvas.height = this.canvas.width;
             this.dartboardRadius = this.canvas.width / 2 - 20;
             
-            // Scale the configurable bullseye radius proportionally for smaller screens
+            // Scale both bullseye radii proportionally for smaller screens
             const scaleFactor = this.dartboardRadius / 380; // Ratio compared to full size
             this.bullseyeRadius = BULLSEYE_DIFFICULTY_RADIUS * scaleFactor;
-            this.outerBullRadius = 60 * scaleFactor;
+            this.outerBullRadius = (BULLSEYE_DIFFICULTY_RADIUS * OUTER_BULL_MULTIPLIER) * scaleFactor;
         }
     }
     
@@ -183,8 +187,9 @@ class DartsGame {
         });
         
         // Draw outer bull (25 points) - green
+        // This now uses the configurable outer bull radius
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius * 0.15, 0, 2 * Math.PI);
+        this.ctx.arc(centerX, centerY, this.outerBullRadius, 0, 2 * Math.PI);
         this.ctx.fillStyle = '#00AA00';
         this.ctx.fill();
         this.ctx.strokeStyle = '#FFFFFF';
@@ -229,8 +234,8 @@ class DartsGame {
             this.drawSection(centerX, centerY, radius * 0.52, radius * 0.82, startAngle, endAngle, 
                 isEven ? lightColor : darkColor);
             
-            // Draw inner single area
-            this.drawSection(centerX, centerY, radius * 0.15, radius * 0.42, startAngle, endAngle, 
+            // Draw inner single area - now extends all the way to center (0 radius)
+            this.drawSection(centerX, centerY, 0, radius * 0.42, startAngle, endAngle, 
                 isEven ? lightColor : darkColor);
         }
     }
