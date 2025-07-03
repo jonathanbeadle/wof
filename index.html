@@ -6,12 +6,14 @@
   <title>The Ivorson Wheel Of Fortune</title>
   <link rel="stylesheet" href="style.css" />
   <script>
-    // Check if we need to redirect to the timer game on initial load
+    // Check if we need to redirect to other games on initial load
     document.addEventListener('DOMContentLoaded', () => {
       const MODE_STORAGE_KEY = 'wheelMode';
       const selectedMode = localStorage.getItem(MODE_STORAGE_KEY);
       if (selectedMode === 'timer') {
         window.location.href = 'timer.html';
+      } else if (selectedMode === 'darts') {
+        window.location.href = 'darts.html';
       }
     });
   </script>
