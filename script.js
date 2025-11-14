@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'darts.html';
         return;
     }
+    if (selectedMode === 'bingo') {
+        window.location.href = 'bingo.html';
+        return;
+    }
     currentMode = selectedMode || 'standard';
 });
 // --------------------------
