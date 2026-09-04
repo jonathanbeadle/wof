@@ -1,0 +1,530 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("dartsbg.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  color: white;
+  overflow: hidden;
+}
+
+.mute-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  z-index: 1000;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  line-height: 1;
+}
+
+.mute-button:hover {
+  opacity: 1;
+}
+
+.mute-button .icon-muted {
+  display: none;
+}
+
+.mute-button.muted .icon-unmuted {
+  display: none;
+}
+
+.mute-button.muted .icon-muted {
+  display: inline;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.dart-game-layout {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  max-width: 1400px;
+  width: 100%;
+  height: 90vh;
+}
+
+.dartboard-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scoreboard-section {
+  flex: 0 0 380px;
+}
+
+.game-container {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 20px;
+  border: 3px solid #ffd700;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  max-width: 800px;
+  width: 100%;
+}
+
+.scoreboard {
+  background: rgba(0, 0, 0, 0.9);
+  border: 3px solid #ffd700;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  text-align: center;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.scoreboard-header {
+  border-bottom: 2px solid #ffd700;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.game-title h1 {
+  font-size: 1.8rem;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.game-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+}
+
+.prize-info {
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+.prize-text {
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.prize-subtext {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+
+.prize-main {
+  font-size: 1.8rem;
+  color: #ffd700;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.instructions {
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.instructions-title {
+  font-size: 1.2rem;
+  color: #ffd700;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+}
+
+.instruction-step {
+  font-size: 1rem;
+  color: #fff;
+  margin: 8px 0;
+  text-align: left;
+  padding-left: 5px;
+}
+
+.scoreboard-footer {
+  border-top: 2px solid #ffd700;
+  padding-top: 20px;
+}
+
+.game-status {
+  font-size: 1.1rem;
+  color: #ffd700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.logo-container {
+  margin-bottom: 10px;
+}
+
+.ivorson-logo {
+  height: 60px;
+  width: auto;
+}
+
+.dartboard-container {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+#dartboardCanvas {
+  border-radius: 50%;
+  background: #000;
+}
+
+.aiming-reticle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ff0000;
+  border-radius: 50%;
+  background: rgba(255, 0, 0, 0.4);
+  pointer-events: none;
+  display: none;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  box-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000, 0 0 6px rgba(0, 0, 0, 1);
+}
+
+.aiming-reticle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 80px;
+  background: #ff0000;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 1), 
+              1px 0 0 rgba(0, 0, 0, 0.8), 
+              -1px 0 0 rgba(0, 0, 0, 0.8),
+              inset 0 0 2px rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 1px;
+}
+
+.aiming-reticle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 4px;
+  background: #ff0000;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 1), 
+              0 1px 0 rgba(0, 0, 0, 0.8), 
+              0 -1px 0 rgba(0, 0, 0, 0.8),
+              inset 0 0 2px rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 1px;
+}
+
+.dart-hit {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #8B4513;
+  border-radius: 50%;
+  border: 3px solid #FFD700;
+  display: none;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.9), 0 0 25px rgba(139, 69, 19, 0.6);
+}
+
+.dart-hit::before {
+  display: none;
+}
+
+.game-status {
+  font-size: 1.4rem;
+  color: #ffd700;
+  margin: 20px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  min-height: 30px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(26,26,26,0.7), rgba(51,51,51,0.7));
+  padding: 40px;
+  position: relative;
+  z-index: 10000;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 80%;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.7);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  animation: slideInUp 0.5s ease-out;
+  pointer-events: auto;
+}
+
+.result-header {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.win-header {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  animation: pulse 1s infinite;
+}
+
+.lose-header {
+  color: #FF4500;
+  animation: shake 0.5s;
+}
+
+.result-text {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.result-distance {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  color: #CCCCCC;
+}
+
+.play-again-button {
+  background: linear-gradient(45deg, #333, #666);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.play-again-button:hover {
+  background: linear-gradient(45deg, #444, #777);
+  transform: translateY(-3px);
+}
+
+.prize-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Particle Canvas */
+#particleCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* Responsibility Footer */
+.responsibility-footer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 100;
+}
+
+.responsibility-logo {
+  height: 40px;
+  width: auto;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  }
+  50% { 
+    transform: scale(1.05); 
+    text-shadow: 0 0 20px rgba(255, 215, 0, 1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dart-game-layout {
+    max-width: 1100px;
+  }
+  
+  #dartboardCanvas {
+    width: 650px !important;
+    height: 650px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dart-game-layout {
+    flex-direction: column;
+    gap: 20px;
+    height: auto;
+  }
+  
+  .scoreboard-section {
+    flex: none;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .scoreboard {
+    height: auto;
+    min-height: 400px;
+  }
+  
+  #dartboardCanvas {
+    width: 600px !important;
+    height: 600px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .dart-game-layout {
+    gap: 15px;
+  }
+  
+  .scoreboard {
+    padding: 20px;
+  }
+  
+  .game-title h1 {
+    font-size: 1.4rem;
+  }
+  
+  #dartboardCanvas {
+    width: 500px !important;
+    height: 500px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #dartboardCanvas {
+    width: 400px !important;
+    height: 400px !important;
+  }
+  
+  .scoreboard {
+    padding: 15px;
+  }
+  
+  .game-title h1 {
+    font-size: 1.2rem;
+  }
+  
+  .prize-main {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #dartboardCanvas {
+    width: 350px !important;
+    height: 350px !important;
+  }
+  
+  .responsibility-footer {
+    bottom: 10px;
+  }
+  
+  .responsibility-logo {
+    height: 30px;
+  }
+}

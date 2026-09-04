@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darts Challenge - The Ivorson Pub</title>
+  <link rel="stylesheet" href="darts.css" />
+</head>
+<body>
+  <!-- Mute Button with Icons -->
+  <button id="muteButton" class="mute-button">
+      <span class="icon-unmuted">🔊</span>
+      <span class="icon-muted">🔇</span>
+  </button>
+  
+  <div class="container">
+    <div class="dart-game-layout">
+      <!-- Dartboard Section -->
+      <div class="dartboard-section">
+        <div class="dartboard-container" id="dartboardContainer">
+          <canvas id="dartboardCanvas" width="800" height="800"></canvas>
+          <div id="aimingReticle" class="aiming-reticle"></div>
+          <div id="dartHit" class="dart-hit"></div>
+        </div>
+      </div>
+      
+      <!-- Scoreboard Section -->
+      <div class="scoreboard-section">
+        <div class="scoreboard">
+          <div class="scoreboard-header">
+            <div class="logo-container">
+              <img src="logo1.png" alt="The Ivorson Logo" class="ivorson-logo">
+            </div>
+          </div>
+          
+          <div class="game-info">
+            <div class="game-title">
+              <h1>BULLSEYE CHALLENGE</h1>
+            </div>
+            
+            <div class="prize-info">
+              <div class="prize-text">HIT THE BULLSEYE</div>
+              <div class="prize-subtext">TO WIN A</div>
+              <div class="prize-main">FREE ROUND!</div>
+            </div>
+            
+            <div class="instructions">
+              <div class="instructions-title">HOW TO PLAY</div>
+              <div class="instruction-step">🎯 Click once to set horizontal position</div>
+              <div class="instruction-step">🎯 Click again to set vertical position</div>
+              <div class="instruction-step">🎯 Hit the bullseye to win!</div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Modal -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <div id="resultHeader" class="result-header">Result</div>
+      <div id="resultText" class="result-text"></div>
+      <div id="resultDistance" class="result-distance"></div>
+      <button id="playAgainButton" class="play-again-button">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Canvas for celebration particles -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Audio elements -->
+  <audio id="aimSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="throwSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/1714/1714-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/518/518-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="loseSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/213/213-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="bullseyeSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/677/677-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="responsibility-footer">
+    <img src="drink-responsibly.png" alt="Drink Responsibly" class="responsibility-logo">
+    <img src="Drinkaware_logo_URL_RGB.webp" alt="Drinkaware" class="responsibility-logo">
+  </div>
+
+  <script src="darts.js"></script>
+</body>
+</html>
